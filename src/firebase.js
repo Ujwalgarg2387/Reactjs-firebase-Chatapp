@@ -4,7 +4,7 @@ import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
-  //here paste the firebase code you will get it in the starting when you first create a project in firebase console
+  //here instead of using below code, paste your firebase code you will get it in the starting when you first create a project in firebase console
   //got to firebase cosole by sigining in
   //create a project/ register an app inside it(there will be option) / you will get the firebase code to add below
   apiKey: "AIzaSyAytch-71RVN1olRDHivmpqpY0nLFJbLdI",
