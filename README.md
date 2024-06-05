@@ -6,3 +6,4 @@ For you to test chatting - After logging in, search for this user - Ujwal and hi
 Website link - https://react-firebase-chatapp.netlify.app/
 
 Results:
+![Screenshot (3)](https://github.com/Ujwalgarg2387/Reactjs-firebase-Chatapp/assets/54837462/91ebbb8e-cdb5-4b0b-8902-9f3267ab9bc0)
