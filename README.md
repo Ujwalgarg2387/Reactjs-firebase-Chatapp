@@ -6,6 +6,9 @@ A modern, real-time chat application built with React and Firebase, featuring Go
 ![Firebase](https://img.shields.io/badge/Firebase-FFCA28?style=for-the-badge&logo=firebase&logoColor=black)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 
+**🌐 Live demo:**  https://react-firebase-chatapp.netlify.app/
+
+
 ## ✨ Features
 
 ### 🔐 Authentication
