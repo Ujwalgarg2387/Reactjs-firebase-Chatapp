@@ -1,150 +1,137 @@
-import React, { useState } from 'react'
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth, db, storage } from '../firebase';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { doc, setDoc } from "firebase/firestore"; 
-import { useNavigate, Link } from 'react-router-dom';
+import { useState } from "react";
+import {
+  auth,
+  createUserWithEmailAndPassword,
+  db,
+  doc,
+  setDoc,
+} from "../firebase";
+import { useNavigate } from "react-router-dom";
 
-const Register = () => {
-  const [err, setErr] = useState(false);
-  const [file, setFile] = useState(null);
-  const navigate = useNavigate();
+export default function Register() {
+  const nav = useNavigate();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleFileChange = (e) => {
-    if (e.target.files[0]) {
-      setFile(e.target.files[0]);
-    }
-  };
-
-  const handleSubmit = async (e) => {
+  async function registerUser(e) {
     e.preventDefault();
-    const formData = new FormData(e.target);
-    const displayName = formData.get('displayName');
-    const email = formData.get('email');
-    const password = formData.get('password');
-    console.log('Display Name:', displayName);
-    console.log('Email:', email);
-    console.log('Password:', password);
+    
+    if (!email || !password || !confirmPassword) {
+      alert("Please fill in all fields");
+      return;
+    }
 
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+
+    if (password.length < 6) {
+      alert("Password must be at least 6 characters");
+      return;
+    }
+
+    setLoading(true);
     try {
       const res = await createUserWithEmailAndPassword(auth, email, password);
 
-      const storageRef = ref(storage, displayName);
-      const uploadTask = uploadBytesResumable(storageRef, file);
-      uploadTask.on('state_changed', 
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          console.log('Upload is ' + progress + '% done');
-          switch (snapshot.state) {
-            case 'paused':
-              console.log('Upload is paused');
-              break;
-            case 'running':
-              console.log('Upload is running');
-              break;
-          }
-        }, 
-        (error) => {
-          setErr(true);
-        }, 
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then( async(downloadURL) => {
-            await updateProfile(res.user, {
-              displayName,
-              photoURL:downloadURL,
-            });
-            
-            await setDoc(doc(db, "users", res.user.uid),{
-              uid: res.user.uid,
-              displayName,
-              email,
-              photoURL:downloadURL,
-            });
-            
-            await setDoc(doc(db, 'userChats', res.user.uid),{});
-            navigate("/");
-            
-          });
-        }
-      );
-      
-    } catch (err) {
-      setErr(true)
-      console.log(err);
-    }
-    }
-    return (
-        <div className="flex items-center justify-center h-screen bg-gradient-to-l from-amber-300 via-orange-200 to-amber-100">
-          <div className="bg-white rounded-lg shadow-lg p-8 max-w-md w-full">
-            <div className="text-center mb-6">
-              <span className="text-3xl font-bold text-amber-800">Chit-Chat</span>
-              <h2 className="text-2xl font-semibold text-gray-800">Register</h2>
-            </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                required
-                type="text"
-                name='displayName'
-                placeholder="Display Name"
-                className="w-full px-4 py-2 rounded-md bg-orange-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-              <input
-                required
-                type="email"
-                name='email'
-                placeholder="Email"
-                className="w-full px-4 py-2 rounded-md bg-orange-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-              <input
-                required
-                type="password"
-                name='password'
-                placeholder="Password"
-                className="w-full px-4 py-2 rounded-md bg-orange-100 text-gray-800 focus:outline-none focus:ring-2 focus:ring-amber-400"
-              />
-              <div className="relative">
-                <input
-                  type="file"
-                  id="file"
-                  name='avatar'
-                  className="hidden"
-                  onChange={handleFileChange}
-                />
-                <label
-                  htmlFor="file"
-                  className="flex items-center justify-center px-4 py-2 bg-amber-600 text-white rounded-md cursor-pointer"
-                >
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="h-6 w-6 mr-2"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    />
-                  </svg>
-                  <span>Add an avatar</span>
-                </label>
-              </div>
-              <button className="w-full py-2 px-4 bg-amber-700 text-white font-semibold rounded-md hover:bg-amber-800 focus:outline-none focus:ring-2 focus:ring-amber-400 focus:ring-opacity-75 transition-colors duration-300">
-                Sign up
-              </button>
-              {err && <span>Something went wrong</span>}
-            </form>
-            <p className="mt-4 text-center text-gray-600">
-              You do have an account?{" "}
-              <Link to="/login" className="text-amber-600 font-semibold">
-                Login
-              </Link>
-            </p>
-          </div>
-        </div>
-      );
-}
+      await setDoc(doc(db, "users", res.user.uid), {
+        uid: res.user.uid,
+        email,
+        name: email.split("@")[0],
+        profilePic: "",
+      });
 
-export default Register
+      nav("/");
+    } catch (e) {
+      alert(e.message);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 px-4">
+      <div className="w-full max-w-md">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
+            <svg className="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+            </svg>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-800 mb-2">Create Account</h1>
+          <p className="text-gray-600">Join ChatApp today</p>
+        </div>
+
+        {/* Form Card */}
+        <div className="bg-white rounded-2xl shadow-xl p-8">
+          <form onSubmit={registerUser} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Email
+              </label>
+              <input
+                type="email"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Password
+              </label>
+              <input
+                type="password"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Create a password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+              />
+              <p className="text-xs text-gray-500 mt-1">Must be at least 6 characters</p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Confirm Password
+              </label>
+              <input
+                type="password"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                placeholder="Confirm your password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                disabled={loading}
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 rounded-lg font-medium hover:from-blue-600 hover:to-indigo-700 transition-all shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {loading ? "Creating account..." : "Create Account"}
+            </button>
+          </form>
+
+          <p className="mt-6 text-center text-sm text-gray-600">
+            Already have an account?{" "}
+            <button
+              onClick={() => nav("/login")}
+              className="text-blue-600 font-medium hover:underline"
+            >
+              Sign in
+            </button>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

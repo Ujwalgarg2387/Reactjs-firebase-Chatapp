@@ -1,16 +1,10 @@
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
 import './index.css'
-import { AuthContextProvider } from './context/AuthContext.jsx'
-import { ChatContextProvider } from './context/ChatContext.jsx'
+import App from './App.jsx'
 
-ReactDOM.createRoot(document.getElementById('root')).render(
-  <AuthContextProvider>
-    <ChatContextProvider>
-      <React.StrictMode>
-        <App />
-      </React.StrictMode>,
-    </ChatContextProvider>
-  </AuthContextProvider>
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
 )

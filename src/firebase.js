@@ -1,12 +1,33 @@
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import {
+  getAuth,
+  GoogleAuthProvider,
+  signInWithPopup,
+  signOut,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+} from "firebase/auth";
+
 import { getStorage } from "firebase/storage";
 
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  addDoc,
+  updateDoc,
+  collection,
+  getDocs,
+  serverTimestamp,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+  writeBatch
+} from "firebase/firestore";
+
 const firebaseConfig = {
-  //here instead of using below code, paste your firebase code you will get it in the starting when you first create a project in firebase console
-  //got to firebase cosole by sigining in
-  //create a project/ register an app inside it(there will be option) / you will get the firebase code to add below
   apiKey: "AIzaSyAytch-71RVN1olRDHivmpqpY0nLFJbLdI",
   authDomain: "chat-21c80.firebaseapp.com",
   projectId: "chat-21c80",
@@ -15,7 +36,30 @@ const firebaseConfig = {
   appId: "1:707381422053:web:f094e2c4251b120f1b310c"
 };
 
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+
 export const auth = getAuth(app);
-export const storage = getStorage();
-export const db = getFirestore();
+export const googleProvider = new GoogleAuthProvider();
+
+export const db = getFirestore(app);
+export const storage = getStorage(app); 
+
+export {
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  signInWithPopup,
+  signOut,
+  doc,
+  setDoc,
+  getDoc,
+  addDoc,
+  updateDoc,
+  collection,
+  getDocs,
+  serverTimestamp,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+  writeBatch
+};
